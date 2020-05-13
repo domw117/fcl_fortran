@@ -1,6 +1,7 @@
 ################################################################################
 cmake_minimum_required(VERSION 3.8)
 project(fcl_fortran)
+enable_language(C CXX Fortran)
 ################################################################################
 
 if(INPUT_THIRD_PARTY_DIR)
@@ -23,10 +24,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # FCL_Fort options
 #option()
 
-# libccd options
-SET(BUILD_SHARED_LIBS OFF CACHE BOOL      "Build static libs")
-SET(ENABLE_DOUBLE_PRECISION ON CACHE BOOL "Enable double precision")
-
 # Setup dependencies
 include(FCLFortDependencies)
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
@@ -35,8 +32,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 # FCL_Fortran library
 ################################################################################
 
-# Extra warnings
-target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
+add_library(${PROJECT_NAME} src/fcl_mod.f90)
 
 # Use C++11
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
@@ -59,5 +55,5 @@ target_link_libraries(${PROJECT_NAME}
 ################################################################################
 
 # Other sources
-add_subdirectory(src)
+#add_subdirectory()
 
