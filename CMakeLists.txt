@@ -32,7 +32,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 # FCL_Fortran library
 ################################################################################
 
-add_library(${PROJECT_NAME} src/fcl_mod.f90)
+add_library(${PROJECT_NAME} src/fortran/fcl_mod.f90)
 
 # Use C++11
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
