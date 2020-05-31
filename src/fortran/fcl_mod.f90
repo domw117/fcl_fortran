@@ -24,8 +24,8 @@ module fcl_mod
 
         subroutine add_fcl_surface_c(num_verts, num_tris, vertices, triangles) &
             & bind(C, name="add_fcl_surface")
-            import
             use iso_c_binding 
+            import      
             integer(kind=c_int), value, intent(in) :: num_verts
             integer(kind=c_int), value, intent(in) :: num_tris
             integer(kind=c_int), intent(in) :: triangles
@@ -33,18 +33,24 @@ module fcl_mod
         end subroutine add_fcl_surface_c
 
 
+        subroutine calculate_fcl_contacts_c() &
+            & bind(C, name="calculate_fcl_contacts")
+            import
+        end subroutine calculate_fcl_contacts_c
+
+
         subroutine get_num_fcl_contacts_c(num_contacts) &
             & bind(C, name="get_num_fcl_contacts")
-            import
             use iso_c_binding 
+            import
             integer(c_int), intent(out) :: num_contacts
         end subroutine get_num_fcl_contacts_c
 
 
         subroutine get_fcl_contacts_c(num_contacts, contact_coords, object_pair, surf_ids_slv, surf_ids_mstr) &
             & bind(C, name="get_fcl_contacts")
-            import
             use iso_c_binding
+            import
             integer(kind=c_int), value, intent(in) :: num_contacts
             real(kind=c_double), intent(out) :: contact_coords
             integer(kind=c_int), intent(out)  :: object_pair
@@ -73,7 +79,7 @@ integer(int32) function add_contact_surface(num_verts, num_tris, vertices, vert_
     integer(c_int), dimension(num_verts), intent(in) :: vert_ids
     integer(c_int), dimension(num_tris), intent(in) :: triangles
 
-    call add_fcl_surface_c(num_verts, num_tris, vertices, triangles)
+    call add_fcl_surface_c(num_verts, num_tris, vertices(1,1), triangles(1))
     call add_surface_map(num_verts, vert_ids)
 
     surface_id = num_surface_maps
@@ -128,6 +134,8 @@ subroutine find_contacts()
 
     integer(int32) :: i
 
+    call calculate_fcl_contacts_c()
+
     num_contacts = 0
     call get_num_fcl_contacts_c(num_contacts)
 
@@ -135,7 +143,7 @@ subroutine find_contacts()
     allocate(object_pair(2*num_contacts))
     allocate(surf_ids_slv(3*num_contacts))
     allocate(surf_ids_mstr(3*num_contacts))
-    call get_fcl_contacts_c(num_contacts, contact_coords, object_pair, surf_ids_slv, surf_ids_mstr)
+    call get_fcl_contacts_c(num_contacts, contact_coords(1), object_pair(1), surf_ids_slv(1), surf_ids_mstr(1))
 
     if (allocated(contacts)) deallocate(contacts)
     allocate(contacts(num_contacts))
@@ -166,7 +174,6 @@ subroutine clean_surfaces()
 
     if (allocated(surface_maps)) then 
         do i=1, num_surface_maps
-            surface_maps(i)%id = -1
             if (allocated(surface_maps(i)%vert_ids)) deallocate(surface_maps(i)%vert_ids)
         enddo
     endif
@@ -181,7 +188,6 @@ subroutine delete_surfaces()
 
     if (allocated(surface_maps)) then 
         do i=1, size(surface_maps)
-            surface_maps(i)%id = -1
             if (allocated(surface_maps(i)%vert_ids)) deallocate(surface_maps(i)%vert_ids)
         enddo
     endif
