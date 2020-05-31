@@ -22,7 +22,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ################################################################################
 
 # FCL_Fort options
-#option()
+option(BUILD_FCL_FORT_TESTS        "Build unit tests"               ON)
 
 # Setup dependencies
 include(FCLFortDependencies)
@@ -56,4 +56,14 @@ target_link_libraries(${PROJECT_NAME}
 
 # Other sources
 #add_subdirectory()
+
+#CTest
+# Build units tests
+if (BUILD_FCL_FORT_TESTS)
+  enable_testing()
+  include(FortranCTest)
+  add_fortran_test_executable (
+    testsuite ${PROJECT_NAME}
+    test/example.f90)
+endif()
 
